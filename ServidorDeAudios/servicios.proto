@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package servicios;
+option go_package = "/serviciosAudio";
+
+service ServiciosAudio {
+  rpc ObtenerTipos(SolicitudVacia)           returns (RespuestaTipos);
+  rpc ObtenerAudiosPorTipo(SolicitudPorTipo) returns (RespuestaListaAudios);
+  rpc ObtenerMetadata(SolicitudPorId)        returns (RespuestaMetadata);
+}
+
+message SolicitudVacia {}
+
+message SolicitudPorTipo {
+  int32 idTipo = 1;
+}
+
+message SolicitudPorId {
+  int32 idAudio = 1;
+}
+
+message TipoAudioDTO {
+  int32  id     = 1;
+  string nombre = 2;
+}
+
+message ResumenAudioDTO {
+  int32  idAudio = 1;
+  string titulo  = 2;
+  int32  idTipo  = 3;
+}
+
+message MusicaDTO {
+  int32  idAudio           = 1;
+  string titulo            = 2;
+  string artistaPrincipal  = 3;
+  string album             = 4;
+  string generoMusical     = 5;
+  string selloDiscografico = 6;
+  int32  anioLanzamiento   = 7;
+}
+
+message PodcastDTO {
+  int32  idAudio                = 1;
+  string tituloPodcast          = 2;
+  string tituloEpisodio         = 3;
+  string anfitrion              = 4;
+  string temporadaEpisodio      = 5;
+  string notasShow              = 6;
+  string clasificacionContenido = 7;
+}
+
+message AudiolibroDTO {
+  int32  idAudio   = 1;
+  string titulo    = 2;
+  string autor     = 3;
+  string narrador  = 4;
+  string editorial = 5;
+  string isbn      = 6;
+  string capitulo  = 7;
+}
+
+message RuidoBlancoDTO {
+  int32  idAudio             = 1;
+  string tipoSonido          = 2;
+  string fuenteAudio         = 3;
+  string usoSugerido         = 4;
+  string proveedorContenido  = 5;
+  int32  duracionBucle       = 6;
+  string frecuenciaDominante = 7;
+}
+
+message RespuestaBase {
+  int32  codigo  = 1;
+  string mensaje = 2;
+}
+
+message RespuestaTipos {
+  RespuestaBase         estado = 1;
+  repeated TipoAudioDTO tipos  = 2;
+}
+
+message RespuestaListaAudios {
+  RespuestaBase            estado = 1;
+  repeated ResumenAudioDTO audios = 2;
+}
+
+message RespuestaMetadata {
+  RespuestaBase estado = 1;
+  oneof metadato {
+    MusicaDTO      musica      = 2;
+    PodcastDTO     podcast     = 3;
+    AudiolibroDTO  audiolibro  = 4;
+    RuidoBlancoDTO ruidoBlanco = 5;
+  }
+}
