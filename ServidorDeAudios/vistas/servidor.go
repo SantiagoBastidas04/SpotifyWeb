@@ -50,9 +50,9 @@ func iniciarServidorREST() {
 	http.HandleFunc("/canciones/metadata", controladores.ObtenerMetadataREST)
 	http.HandleFunc("/canciones", controladores.ListarAudios)
  
-	// CAMBIADO: puerto 6000 
-	fmt.Println("ServidorDeAudios [REST] escuchando en :6000")
-	if err := http.ListenAndServe(":6000", nil); err != nil {
+	// CAMBIADO: puerto 7000 
+	fmt.Println("ServidorDeAudios [REST] escuchando en :7000")
+	if err := http.ListenAndServe(":7000", nil); err != nil {
 		log.Fatalf("Error en servidor REST: %v", err)
 	}
 }

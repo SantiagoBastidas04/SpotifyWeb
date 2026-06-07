@@ -18,7 +18,7 @@ public class RepositorioCancion {
     // Mapa 3: sessionId -> idAudio que esta reproduciendo esa sesion
     private final ConcurrentHashMap<String, String> sessionAudio = new ConcurrentHashMap<>();
 
-
+    private final ConcurrentHashMap<String, Boolean> sesionesQueYaSalieron = new ConcurrentHashMap<>();
 
     public void registrarSesion(String sessionId, String nombreUsuario) {
         sessionNombreUsuarios.put(sessionId, nombreUsuario);
@@ -26,24 +26,28 @@ public class RepositorioCancion {
 
     public void eliminarSesion(String sessionId) {
         sessionNombreUsuarios.remove(sessionId);
+        sesionesQueYaSalieron.remove(sessionId);
     }
 
     public String getNickname(String sessionId) {
         return sessionNombreUsuarios.get(sessionId);
     }
 
-    // ─────────────────────────────────────────────
-    //  Reproduccion
-    // ─────────────────────────────────────────────
+    public void marcarSalidaLimpia(String sessionId) {
+        sesionesQueYaSalieron.put(sessionId, true);
+    }
 
-   
+    public boolean yaSalioLimpiamente(String sessionId) {
+        return sesionesQueYaSalieron.getOrDefault(sessionId, false);
+    }
+    // Reproduccion
+
     public List<String> comenzarReproduccion(String sessionId, String idAudio, String nombreUsuario) {
         sessionAudio.put(sessionId, idAudio);
 
         List<String> oyentes = audioUsuarios.computeIfAbsent(
                 idAudio,
-                k -> Collections.synchronizedList(new java.util.ArrayList<>())
-        );
+                k -> Collections.synchronizedList(new java.util.ArrayList<>()));
 
         // Copiar ANTES de agregar al nuevo — son los que ya estaban
         List<String> oyentesAnteriores = List.copyOf(oyentes);
@@ -51,10 +55,10 @@ public class RepositorioCancion {
         return oyentesAnteriores;
     }
 
-    
     public List<String> pausarReproduccion(String sessionId) {
         String idAudio = sessionAudio.remove(sessionId);
-        if (idAudio == null) return Collections.emptyList();
+        if (idAudio == null)
+            return Collections.emptyList();
 
         List<String> oyentes = audioUsuarios.getOrDefault(idAudio, Collections.emptyList());
 

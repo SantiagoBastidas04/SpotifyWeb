@@ -79,7 +79,7 @@ func ObtenerTodosLosAudios() ([]modelos.ResumenAudio, error) {
 	return todos, nil
 }
 
-─────────────────────────────────────────────
+
 
 func AlmacenarAudio(idTipo int, campos map[string]string, data []byte) (int, error) {
 	titulo := campos["titulo"]

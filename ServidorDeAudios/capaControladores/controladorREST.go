@@ -33,7 +33,7 @@ func manejarPreflight(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-───────────────────────────────────────────
+
 
 type ResumenAudioDTO struct {
 	IdAudio int    `json:"idAudio"`

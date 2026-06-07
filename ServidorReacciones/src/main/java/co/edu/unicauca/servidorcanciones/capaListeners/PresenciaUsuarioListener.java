@@ -51,11 +51,18 @@ public class PresenciaUsuarioListener {
         String nickname = repositorioCancion.getNickname(sessionId);
         String idAudio = repositorioCancion.getAudioActual(sessionId);
 
+        if (repositorioCancion.yaSalioLimpiamente(sessionId)) {
+            repositorioCancion.eliminarSesion(sessionId);
+            System.out.println("[DESCONEXION LIMPIA] " + nickname + " con sesion " + sessionId);
+            return;
+        }
+
+        // Salida abrupta 
         List<String> oyentesRestantes = repositorioCancion.pausarReproduccion(sessionId);
         repositorioCancion.eliminarSesion(sessionId);
 
         if (nickname != null) {
-            System.out.println("[DESCONEXION] " + nickname + " con sesion " + sessionId);
+            System.out.println("[DESCONEXION ABRUPTA] " + nickname + " con sesion " + sessionId);
 
             if (idAudio != null && !oyentesRestantes.isEmpty()) {
                 NotificacionDTO notificacion = new NotificacionDTO(nickname, "PAUSO", oyentesRestantes);

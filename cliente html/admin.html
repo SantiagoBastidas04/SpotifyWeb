@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioStream — Administrador</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🎵 AudioStream</h1>
+        <span class="hdr-tag">⚙ Panel de Administración</span>
+        <a class="btn-back" href="index.html">‹ Volver al cliente</a>
+    </header>
+
+    <main>
+        <div class="card">
+            <div class="card-title">Registrar nuevo audio</div>
+
+            <p style="font-size:.85rem;color:#aaa;margin-bottom:12px;">
+                Selecciona el tipo de audio a registrar:
+            </p>
+            <div class="tipo-grid">
+                <div class="tipo-opt" id="tipo-1" onclick="seleccionarTipo(1)">
+                    <span class="ti-icon">🎵</span>
+                    <span class="ti-name">Música</span>
+                </div>
+                <div class="tipo-opt" id="tipo-2" onclick="seleccionarTipo(2)">
+                    <span class="ti-icon">🎙️</span>
+                    <span class="ti-name">Podcast</span>
+                </div>
+                <div class="tipo-opt" id="tipo-3" onclick="seleccionarTipo(3)">
+                    <span class="ti-icon">📚</span>
+                    <span class="ti-name">Audiolibro</span>
+                </div>
+                <div class="tipo-opt" id="tipo-4" onclick="seleccionarTipo(4)">
+                    <span class="ti-icon">🌊</span>
+                    <span class="ti-name">Ruido Blanco</span>
+                </div>
+            </div>
+
+            <div id="form-campos" style="display:none">
+                <hr class="divider">
+
+                <div class="form-group">
+                    <label>Nombre del archivo (sin extensión .mp3) *</label>
+                    <input type="text" id="f-titulo" placeholder="Ej: Blinding Lights" required />
+                    <div class="hint">
+                        El servidor de streaming buscará este nombre en su directorio
+                        <code style="color:#4ecca3">canciones/</code>
+                    </div>
+                </div>
+
+                <div id="campos-tipo"></div>
+
+                <hr class="divider">
+
+                <div class="file-note">
+                    📁 El archivo MP3 se almacenará en el servidor de audios y metadatos.
+                    Para que el streaming funcione, el archivo también debe estar en el
+                    directorio <code>canciones/</code> del servidor de streaming.
+                </div>
+                <div class="form-group">
+                    <label>Archivo de audio (.mp3) *</label>
+                    <input type="file" id="f-archivo" accept=".mp3,audio/*" required />
+                </div>
+
+                <button class="btn-submit" id="btn-registrar" onclick="registrarAudio()">
+                    ✅ Registrar audio
+                </button>
+
+                <div id="resultado"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="./js/admin.js"></script>
+
+</body>
+
+</html>

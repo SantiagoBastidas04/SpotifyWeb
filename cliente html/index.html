@@ -1,37 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Cliente Audio gRPC-Web</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        #log { border: 1px solid #ccc; padding: 10px; height: 150px; overflow-y: scroll; margin-top: 10px; }
-        .success { color: green; }
-        .error { color: red; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioStream — Cliente Web</title>
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <h1>Transmisión de Audio con gRPC-Web </h1>
-    <p>La conexión se intentará al servidor ubicado en localhost:8080</p>
-    <audio id="audio-player" controls style="display:none"></audio>
 
-    <div>
-        <label for="song-title">Título de la canción:</label>
-        <input id="song-title" type="text" placeholder="cancion1.mp3" value="cancion1.mp3" />
-
-        <label for="format-select">Formato:</label>
-        <select id="format-select">
-            <option value="mp3">mp3</option>
-            <option value="wav">wav</option>
-            <option value="m4a">m4a</option>
-        </select>
+<!-- ═══ LOGIN ═══ -->
+<div id="login-overlay">
+    <div class="login-card">
+        <h1>🎵 AudioStream</h1>
+        <p>Ingresa tu nickname para comenzar</p>
+        <input type="text" id="nick-input" placeholder="Tu nickname..." maxlength="30" autocomplete="off" />
+        <button class="btn-primary" onclick="iniciarSesion()">Entrar ›</button>
     </div>
+</div>
 
-    <button onclick="pedirCancion(document.getElementById('song-title').value || 'cancion1.mp3', document.getElementById('format-select').value || 'mp3')">Pedir Canción</button>
-   
-    <h3 id="status">Esperando petición...</h3>
-    <div id="log"></div>
-    <script src="./bundle.js"></script>
-    <script src="./funciones.js"></script>
-    
+<!-- ═══ APP ═══ -->
+<div id="app">
+    <header>
+        <h1>🎵 AudioStream</h1>
+        <div class="hdr-right">
+            <span id="user-badge" class="badge">👤 —</span>
+            <span id="ws-badge" class="badge off">● Desconectado</span>
+            <button class="btn-sm" onclick="window.open('admin.html','_blank')">⚙ Admin</button>
+            <button class="btn-sm" onclick="cerrarSesion()">⏻ Salir</button>
+        </div>
+    </header>
+
+    <div class="body-wrap">
+
+        <!-- ─── Sidebar ─── -->
+        <aside id="sidebar">
+            <!-- Tipos -->
+            <div class="sb-section">
+                <div class="sb-title">📂 Tipo de audio</div>
+                <div id="tipos-wrap"><div class="placeholder">Cargando tipos...</div></div>
+            </div>
+
+            <!-- Lista -->
+            <div class="sb-section" id="audios-sec" style="display:none">
+                <div class="sb-title" id="audios-sec-title">🎵 Audios</div>
+                <div id="audios-wrap"></div>
+            </div>
+
+            <!-- Detalle -->
+            <div class="sb-section" id="detalle-sec" style="display:none">
+                <div class="sb-title">📄 Detalle</div>
+                <div id="detalle-wrap"></div>
+            </div>
+        </aside>
+
+        <!-- ─── Panel principal ─── -->
+        <main id="main">
+
+            <!-- Reproductor -->
+            <div class="card">
+                <div class="card-title">🎧 Reproductor</div>
+                <div id="now-playing" class="now-playing empty">Selecciona un audio del catálogo para reproducir</div>
+                <audio id="audio-player" controls style="display:none"></audio>
+                <div id="stream-status"></div>
+            </div>
+
+            <!-- Reacciones -->
+            <div class="card">
+                <div class="card-title">💬 Enviar reacción</div>
+                <div class="react-row">
+                    <button class="btn-react" id="br-1" disabled onclick="enviarReaccion('❤️')">❤️</button>
+                    <button class="btn-react" id="br-2" disabled onclick="enviarReaccion('🔥')">🔥</button>
+                    <button class="btn-react" id="br-3" disabled onclick="enviarReaccion('👏')">👏</button>
+                    <button class="btn-react" id="br-4" disabled onclick="enviarReaccion('😂')">😂</button>
+                    <button class="btn-react" id="br-5" disabled onclick="enviarReaccion('🎵')">🎵</button>
+                    <button class="btn-react" id="br-6" disabled onclick="enviarReaccion('😢')">😢</button>
+                </div>
+            </div>
+
+            <!-- Notificaciones -->
+            <div class="card">
+                <div class="card-title">🔔 Notificaciones en vivo</div>
+                <div id="notif-list">
+                    <div class="placeholder">Las notificaciones aparecerán aquí...</div>
+                </div>
+            </div>
+
+            <!-- Log streaming -->
+            <div class="card">
+                <div class="card-title">📊 Log de streaming</div>
+                <div id="log-area"></div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2/lib/stomp.min.js"></script>
+<script src="./bundle.js"></script>
+<script src="./js/funciones.js"></script>
 </body>
 </html>

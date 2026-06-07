@@ -4,6 +4,8 @@ import co.edu.unicauca.servidorcanciones.capaAccesoADatos.RepositorioCancion;
 import co.edu.unicauca.servidorcanciones.capaFachadaServices.DTO.NotificacionDTO;
 import co.edu.unicauca.servidorcanciones.capaFachadaServices.DTO.ReaccionDTO;
 import co.edu.unicauca.servidorcanciones.capaFachadaServices.DTO.ReproduccionDTO;
+import co.edu.unicauca.servidorcanciones.capaFachadaServices.DTO.SalidaDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -24,21 +26,29 @@ public class CancionController {
 
     // -----------------------------------------------------------------------
     // CANAL 1 — Reacciones
-    // Cliente envia:  /app/reaccion
+    // Cliente envia: /app/reaccion
     // Servidor publica en: /audio/{idAudio}/reacciones
     // Reciben: todos los que estan reproduciendo ese audio
     // -----------------------------------------------------------------------
     @MessageMapping("/reaccion")
     public void enviarReaccion(@Payload ReaccionDTO reaccion,
-                               SimpMessageHeaderAccessor headerAccessor) {
+            SimpMessageHeaderAccessor headerAccessor) {
 
         String sessionId = headerAccessor.getSessionId();
         String idAudio = repositorioCancion.getAudioActual(sessionId);
 
-        // Verificar que el usuario realmente este reproduciendo ese audio
-        if (idAudio == null || !idAudio.equals(reaccion.getIdAudio())) return;
+        // LOG TEMPORAL para depurar
+        System.out.println("[REACCION] sessionId=" + sessionId
+                + " idAudioServidor=" + idAudio
+                + " idAudioReaccion=" + reaccion.getIdAudio()
+                + " usuario=" + reaccion.getNombreUsuario());
+
+        if (idAudio == null || !idAudio.equals(reaccion.getIdAudio()))
+            return;
 
         List<String> oyentes = repositorioCancion.getOyentes(idAudio);
+        System.out.println("[REACCION] oyentes=" + oyentes); // LOG TEMPORAL
+
         if (!oyentes.isEmpty()) {
             messagingTemplate.convertAndSend(
                     "/audio/" + idAudio + "/reacciones", reaccion);
@@ -47,13 +57,13 @@ public class CancionController {
 
     // -----------------------------------------------------------------------
     // CANAL 2 — Comenzar reproduccion
-    // Cliente envia:  /app/reproducir
+    // Cliente envia: /app/reproducir
     // Servidor publica en: /audio/{idAudio}/reproduciendo
     // Reciben: los oyentes que ya estaban antes de que llegara el nuevo
     // -----------------------------------------------------------------------
     @MessageMapping("/reproducir")
     public void comenzarReproduccion(@Payload ReproduccionDTO evento,
-                                     SimpMessageHeaderAccessor headerAccessor) {
+            SimpMessageHeaderAccessor headerAccessor) {
 
         String sessionId = headerAccessor.getSessionId();
         String idAudio = evento.getIdAudio();
@@ -85,13 +95,13 @@ public class CancionController {
     // CANAL 3 — Pausar reproduccion
     // CAMBIADO: endpoint era /app/detener, ahora es /app/pausar
     // porque el requerimiento dice "cuando el cliente pausa"
-    // Cliente envia:  /app/pausar
+    // Cliente envia: /app/pausar
     // Servidor publica en: /audio/{idAudio}/pausas
     // Reciben: los oyentes que siguen escuchando
     // -----------------------------------------------------------------------
     @MessageMapping("/pausar")
     public void pausarReproduccion(@Payload ReproduccionDTO evento,
-                                   SimpMessageHeaderAccessor headerAccessor) {
+            SimpMessageHeaderAccessor headerAccessor) {
 
         String sessionId = headerAccessor.getSessionId();
         String idAudio = evento.getIdAudio();
@@ -110,6 +120,28 @@ public class CancionController {
         if (!oyentesRestantes.isEmpty()) {
             messagingTemplate.convertAndSend(
                     "/audio/" + idAudio + "/pausas", notificacion);
+        }
+    }
+
+    @MessageMapping("/salir")
+    public void salirReproduccion(@Payload SalidaDTO evento,
+            SimpMessageHeaderAccessor headerAccessor) {
+
+        String sessionId = headerAccessor.getSessionId();
+        String idAudio = evento.getIdAudio();
+        String nombreUsuario = evento.getNombreUsuario();
+
+        if (idAudio == null || idAudio.isEmpty())
+            return;
+
+        repositorioCancion.marcarSalidaLimpia(sessionId);
+
+        List<String> oyentesRestantes = repositorioCancion.pausarReproduccion(sessionId);
+
+        NotificacionDTO notificacion = new NotificacionDTO(nombreUsuario, "SALIO", oyentesRestantes);
+
+        if (!oyentesRestantes.isEmpty()) {
+            messagingTemplate.convertAndSend("/audio/" + idAudio + "/salidas", notificacion);
         }
     }
 }
