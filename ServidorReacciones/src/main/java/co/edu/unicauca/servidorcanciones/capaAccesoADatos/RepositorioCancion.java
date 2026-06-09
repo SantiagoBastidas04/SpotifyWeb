@@ -49,9 +49,10 @@ public class RepositorioCancion {
                 idAudio,
                 k -> Collections.synchronizedList(new java.util.ArrayList<>()));
 
-        // Copiar ANTES de agregar al nuevo — son los que ya estaban
         List<String> oyentesAnteriores = List.copyOf(oyentes);
-        oyentes.add(nombreUsuario);
+        if (!oyentes.contains(nombreUsuario)) {
+            oyentes.add(nombreUsuario);
+        }
         return oyentesAnteriores;
     }
 

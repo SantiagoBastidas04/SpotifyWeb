@@ -10,6 +10,7 @@ let nickname = null;
 let audioActual = null;
 let suscripciones = [];
 let cerrando = false;
+let iniciandoStream = false;
 //  Referencia al reproductor de audio 
 const reproductor = document.getElementById('audio-player');
 
@@ -202,7 +203,7 @@ function reproducirAudio() {
 
     // Suscribirse PRIMERO y esperar antes de iniciar el stream
     suscribirseAlAudio(String(idAudio));
-
+    iniciandoStream = true;
     setTimeout(() => {
         // Notificar reproducción después de suscribirse
         notificarReproduccion(String(idAudio));
@@ -233,9 +234,10 @@ function inicializarReproductor() {
         document.getElementById('stream-status').textContent = '▶ Reproduciendo';
         escribirLog('Reproducción iniciada ▶', 'ok');
         // Notificar al servidor que se reanuda la reproducción
-        if (audioActual) {
+        if (audioActual && !iniciandoStream) {
             notificarReproduccion(String(audioActual.idAudio));
         }
+        iniciandoStream = false;
     });
 
     reproductor.addEventListener('pause', function () {
@@ -292,6 +294,8 @@ function conectarWebSocket() {
 }
 
 function suscribirseAlAudio(idAudio) {
+    console.log('suscribirseAlAudio llamado para audio:', idAudio, 
+                'suscripciones activas:', suscripciones.length);
     if (!stompClient || !stompClient.connected) return;
 
     // Cancelar suscripciones anteriores
@@ -375,7 +379,7 @@ function enviarReaccion(emoji) {
         tipoReaccion: emoji
     }));
     // Feedback visual inmediato para quien envía
-    mostrarEmojiFlotante(emoji);
+    //mostrarEmojiFlotante(emoji);
 }
 
 function habilitarReacciones(habilitar) {
@@ -441,7 +445,7 @@ function cerrarSesion() {
     cerrando = true;
 
     if (audioActual && stompClient && stompClient.connected) {
-        notificarSalida(String(audioActual.idAudio)); 
+        notificarSalida(String(audioActual.idAudio));
     }
     if (stompClient && stompClient.connected) {
         stompClient.disconnect();
@@ -477,9 +481,9 @@ function cerrarSesion() {
 }
 
 // Cierre abrupto del navegador
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     if (audioActual && stompClient && stompClient.connected) {
-        notificarSalida(String(audioActual.idAudio)); 
+        notificarSalida(String(audioActual.idAudio));
         stompClient.disconnect();
     }
 });
