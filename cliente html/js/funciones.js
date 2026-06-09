@@ -201,6 +201,8 @@ function reproducirAudio() {
     reproductor.style.display = 'none';
     reproductor.src = '';
 
+    document.getElementById('notif-list').innerHTML = '<div class="placeholder">Las notificaciones aparecerán aquí...</div>';
+
     // Suscribirse PRIMERO y esperar antes de iniciar el stream
     suscribirseAlAudio(String(idAudio));
     iniciandoStream = true;
