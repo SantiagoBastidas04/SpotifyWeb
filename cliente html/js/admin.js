@@ -151,3 +151,170 @@ function mostrarResultado(msg, tipo) {
     el.textContent = msg;
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+
+async function cargarTiposAdmin() {
+    try {
+
+        const resp = await fetch(
+            REST_URL + '/canciones/tipos'
+        );
+
+        const tipos = await resp.json();
+
+        const contenedor =
+            document.getElementById('tipos-admin');
+
+        contenedor.innerHTML = '';
+
+        tipos.forEach(tipo => {
+
+            const btn = document.createElement('button');
+
+            btn.className = 'tipo-opt';
+
+            btn.innerHTML =
+                `<span class="ti-name">${tipo.nombre}</span>`;
+
+            btn.onclick = () =>
+                cargarAudiosPorTipoAdmin(tipo.id, tipo.nombre);
+
+            contenedor.appendChild(btn);
+        });
+
+    } catch (e) {
+
+        document.getElementById('tipos-admin').innerHTML =
+            '<p style="color:red">Error: ' + e.message + '</p>';
+    }
+}
+async function cargarAudiosPorTipoAdmin(idTipo, nombreTipo) {
+
+    try {
+
+        const resp = await fetch(
+            REST_URL +
+            '/canciones/por-tipo?idTipo=' +
+            idTipo
+
+        );
+
+        const audios = await resp.json();
+
+        const contenedor =
+            document.getElementById('audios-admin');
+
+        contenedor.innerHTML =
+            `<h3>${nombreTipo}</h3>`;
+
+        if (!audios.length) {
+
+            contenedor.innerHTML +=
+                '<p>No hay audios registrados</p>';
+
+            return;
+        }
+
+        audios.forEach(audio => {
+
+            const card = document.createElement('div');
+
+            card.className = 'audio-card';
+
+            card.innerHTML = `
+        <strong>${audio.titulo}</strong><br>
+        ID Audio: ${audio.idAudio}
+    `;
+
+            card.onclick = () => cargarMetadataAdmin(audio.idAudio);
+
+            contenedor.appendChild(card);
+        });
+
+    } catch (e) {
+
+        document.getElementById('audios-admin').innerHTML =
+            '<p style="color:red">Error: ' + e.message + '</p>';
+    }
+}
+async function cargarMetadataAdmin(idAudio) {
+
+    try {
+
+        const resp = await fetch(
+            REST_URL + '/canciones/metadata?idAudio=' + idAudio
+        );
+
+        const meta = await resp.json();
+
+        renderizarMetadataAdmin(meta);
+
+    } catch (e) {
+
+        document.getElementById('detalle-admin').innerHTML =
+            '<p style="color:red">Error: ' + e.message + '</p>';
+    }
+}
+function renderizarMetadataAdmin(meta) {
+
+    let html = `
+        <div class="audio-card">
+            <h3>${meta.titulo || 'Sin título'}</h3>
+            <p><strong>ID:</strong> ${meta.idAudio}</p>
+        </div>
+    `;
+
+    switch (meta.tipo) {
+
+        case 1:
+            html += `
+                <div class="audio-card">
+                    <p><strong>Artista:</strong> ${meta.artistaPrincipal || '-'}</p>
+                    <p><strong>Álbum:</strong> ${meta.album || '-'}</p>
+                    <p><strong>Género:</strong> ${meta.generoMusical || '-'}</p>
+                    <p><strong>Sello:</strong> ${meta.selloDiscografico || '-'}</p>
+                    <p><strong>Año:</strong> ${meta.anioLanzamiento || '-'}</p>
+                </div>
+            `;
+            break;
+
+        case 2:
+            html += `
+                <div class="audio-card">
+                    <p><strong>Podcast:</strong> ${meta.tituloPodcast || '-'}</p>
+                    <p><strong>Episodio:</strong> ${meta.tituloEpisodio || '-'}</p>
+                    <p><strong>Anfitrión:</strong> ${meta.anfitrion || '-'}</p>
+                    <p><strong>Temporada:</strong> ${meta.temporadaEpisodio || '-'}</p>
+                    <p><strong>Notas:</strong> ${meta.notasShow || '-'}</p>
+                    <p><strong>Clasificación:</strong> ${meta.clasificacionContenido || '-'}</p>
+                </div>
+            `;
+            break;
+
+        case 3:
+            html += `
+                <div class="audio-card">
+                    <p><strong>Autor:</strong> ${meta.autor || '-'}</p>
+                    <p><strong>Narrador:</strong> ${meta.narrador || '-'}</p>
+                    <p><strong>Editorial:</strong> ${meta.editorial || '-'}</p>
+                    <p><strong>ISBN:</strong> ${meta.isbn || '-'}</p>
+                    <p><strong>Capítulo:</strong> ${meta.capitulo || '-'}</p>
+                </div>
+            `;
+            break;
+
+        case 4:
+            html += `
+                <div class="audio-card">
+                    <p><strong>Tipo sonido:</strong> ${meta.tipoSonido || '-'}</p>
+                    <p><strong>Fuente:</strong> ${meta.fuenteAudio || '-'}</p>
+                    <p><strong>Uso sugerido:</strong> ${meta.usoSugerido || '-'}</p>
+                    <p><strong>Duración:</strong> ${meta.duracionBucle || '-'} min</p>
+                    <p><strong>Proveedor:</strong> ${meta.proveedorContenido || '-'}</p>
+                    <p><strong>Frecuencia:</strong> ${meta.frecuenciaDominante || '-'}</p>
+                </div>
+            `;
+            break;
+    }
+
+    document.getElementById('detalle-admin').innerHTML = html;
+}
