@@ -2,6 +2,7 @@ package modelos
 
 type RuidoBlanco struct {
 	idAudio             int
+	titulo              string
 	tipoSonido          string
 	fuenteAudio         string
 	usoSugerido         string
@@ -10,8 +11,13 @@ type RuidoBlanco struct {
 	frecuenciaDominante string
 }
 
+
+
 func (r *RuidoBlanco) GetIdAudio() int                    { return r.idAudio }
 func (r *RuidoBlanco) SetIdAudio(id int)                   { r.idAudio = id }
+
+func (r *RuidoBlanco) GetTitulo() string                   { return r.titulo }
+func (r *RuidoBlanco) SetTitulo(titulo string)              { r.titulo = titulo }
 
 func (r *RuidoBlanco) GetTipoSonido() string               { return r.tipoSonido }
 func (r *RuidoBlanco) SetTipoSonido(tipo string)            { r.tipoSonido = tipo }

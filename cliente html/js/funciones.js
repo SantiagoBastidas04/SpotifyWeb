@@ -128,6 +128,8 @@ async function seleccionarAudio(audio, btnEl) {
 function renderizarDetalle(meta) {
     const tipo = meta.tipo;
     let filas = '';
+    console.log("¡Revisando qué llega del servidor!", meta);
+    console.log("VALOR REAL EN BASE DE DATOS:", meta.titulo);
     let titulo = meta.titulo || '—';
 
     if (tipo === 1) {
@@ -139,7 +141,6 @@ function renderizarDetalle(meta) {
           <div class="meta-row"><span class="mk">Año</span><span class="mv">${meta.anioLanzamiento || '—'}</span></div>`;
 
     } else if (tipo === 2) {
-        titulo = meta.tituloPodcast || meta.titulo || '—';
         filas = `
           <div class="meta-row"><span class="mk">Episodio</span><span class="mv">${meta.tituloEpisodio || '—'}</span></div>
           <div class="meta-row"><span class="mk">Anfitrión</span><span class="mv">${meta.anfitrion || '—'}</span></div>
@@ -156,7 +157,6 @@ function renderizarDetalle(meta) {
           <div class="meta-row"><span class="mk">Capítulo</span><span class="mv">${meta.capitulo || '—'}</span></div>`;
 
     } else if (tipo === 4) {
-        titulo = (meta.tipoSonido || '') + ' — ' + (meta.fuenteAudio || '');
         filas = `
           <div class="meta-row"><span class="mk">Tipo sonido</span><span class="mv">${meta.tipoSonido || '—'}</span></div>
           <div class="meta-row"><span class="mk">Fuente</span><span class="mv">${meta.fuenteAudio || '—'}</span></div>
@@ -168,7 +168,7 @@ function renderizarDetalle(meta) {
     // Guardar estado del audio seleccionado
     audioActual = {
         idAudio: meta.idAudio,
-        titulo: meta.titulo || titulo,   // nombre del archivo (sin extensión)
+        titulo: titulo, // Tomará limpiamente el meta.titulo original sin mutaciones
         formato: 'mp3',
         displayTitle: titulo,
         idTipo: tipo

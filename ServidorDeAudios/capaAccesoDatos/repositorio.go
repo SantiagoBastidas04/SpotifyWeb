@@ -114,6 +114,7 @@ func cargarAudiolibros() {
 func cargarRuidosBlancos() {
 	r1 := modelos.RuidoBlanco{}
 	r1.SetIdAudio(401)
+	r1.SetTitulo("Lluvia Suave")
 	r1.SetTipoSonido("Ruido Rosa")
 	r1.SetFuenteAudio("Lluvia suave")
 	r1.SetUsoSugerido("Dormir")
@@ -123,6 +124,7 @@ func cargarRuidosBlancos() {
 
 	r2 := modelos.RuidoBlanco{}
 	r2.SetIdAudio(402)
+	r2.SetTitulo("Ventilador Constante")
 	r2.SetTipoSonido("Ruido Blanco")
 	r2.SetFuenteAudio("Ventilador")
 	r2.SetUsoSugerido("Concentración")
@@ -153,7 +155,7 @@ func ObtenerAudiosPorTipo(idTipo int) []modelos.ResumenAudio {
 		for _, p := range podcasts {
 			r := modelos.ResumenAudio{}
 			r.SetIdAudio(p.GetIdAudio())
-			r.SetTitulo(p.GetTituloPodcast() + " - " + p.GetTituloEpisodio())
+			r.SetTitulo(p.GetTituloPodcast())
 			r.SetIdTipo(2)
 			resultado = append(resultado, r)
 		}
@@ -169,7 +171,7 @@ func ObtenerAudiosPorTipo(idTipo int) []modelos.ResumenAudio {
 		for _, rb := range ruidosBlancos {
 			r := modelos.ResumenAudio{}
 			r.SetIdAudio(rb.GetIdAudio())
-			r.SetTitulo(rb.GetTipoSonido() + " - " + rb.GetFuenteAudio())
+			r.SetTitulo(rb.GetTitulo())
 			r.SetIdTipo(4)
 			resultado = append(resultado, r)
 		}

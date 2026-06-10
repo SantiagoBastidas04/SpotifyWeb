@@ -8,8 +8,6 @@ import (
 	"servidor.local/servidorDeAudios/modelos"
 )
 
-
-
 func ObtenerTipos() []modelos.TipoAudio {
 	fmt.Println("[Fachada] ObtenerTipos llamado")
 	return repo.ObtenerTipos()
@@ -79,8 +77,6 @@ func ObtenerTodosLosAudios() ([]modelos.ResumenAudio, error) {
 	return todos, nil
 }
 
-
-
 func AlmacenarAudio(idTipo int, campos map[string]string, data []byte) (int, error) {
 	titulo := campos["titulo"]
 	fmt.Printf("[Fachada] AlmacenarAudio idTipo=%d titulo='%s'\n", idTipo, titulo)
@@ -110,6 +106,7 @@ func AlmacenarAudio(idTipo int, campos map[string]string, data []byte) (int, err
 	case 2:
 		// Podcast
 		p := modelos.Podcast{}
+		p.SetTitulo(titulo)
 		p.SetTituloPodcast(campos["tituloPodcast"])
 		p.SetTituloEpisodio(campos["tituloEpisodio"])
 		p.SetAnfitrion(campos["anfitrion"])
@@ -132,6 +129,7 @@ func AlmacenarAudio(idTipo int, campos map[string]string, data []byte) (int, err
 	case 4:
 		// Ruido Blanco
 		rb := modelos.RuidoBlanco{}
+		rb.SetTitulo(titulo)
 		rb.SetTipoSonido(campos["tipoSonido"])
 		rb.SetFuenteAudio(campos["fuenteAudio"])
 		rb.SetUsoSugerido(campos["usoSugerido"])
@@ -147,11 +145,8 @@ func AlmacenarAudio(idTipo int, campos map[string]string, data []byte) (int, err
 
 	fmt.Printf("[Fachada] Audio registrado en memoria con id=%d\n", idAsignado)
 
-
 	return idAsignado, nil
 }
-
-
 
 type MetadataDTO struct {
 	IdAudio int    `json:"idAudio"`
@@ -203,7 +198,7 @@ func ConvertirMetadataADTO(dato interface{}, idTipo int, idAudio int) MetadataDT
 		dto.AnioLanzamiento = m.GetAnioLanzamiento()
 	case 2:
 		p := dato.(modelos.Podcast)
-		dto.Titulo = p.GetTituloPodcast()
+		dto.Titulo = p.GetTitulo()
 		dto.TituloPodcast = p.GetTituloPodcast()
 		dto.TituloEpisodio = p.GetTituloEpisodio()
 		dto.Anfitrion = p.GetAnfitrion()
@@ -220,7 +215,7 @@ func ConvertirMetadataADTO(dato interface{}, idTipo int, idAudio int) MetadataDT
 		dto.Capitulo = a.GetCapitulo()
 	case 4:
 		rb := dato.(modelos.RuidoBlanco)
-		dto.Titulo = rb.GetTipoSonido() + " - " + rb.GetFuenteAudio()
+		dto.Titulo = rb.GetTitulo()
 		dto.TipoSonido = rb.GetTipoSonido()
 		dto.FuenteAudio = rb.GetFuenteAudio()
 		dto.UsoSugerido = rb.GetUsoSugerido()
