@@ -70,6 +70,7 @@ func cargarMusicas() {
 func cargarPodcasts() {
 	p1 := modelos.Podcast{}
 	p1.SetIdAudio(201)
+	p1.SetTitulo("Lex Fridman Podcast")
 	p1.SetTituloPodcast("Lex Fridman Podcast")
 	p1.SetTituloEpisodio("Elon Musk War, AI, Aliens")
 	p1.SetAnfitrion("Lex Fridman")
@@ -79,6 +80,7 @@ func cargarPodcasts() {
 
 	p2 := modelos.Podcast{}
 	p2.SetIdAudio(202)
+	p2.SetTitulo("El Cartel Paranormal")
 	p2.SetTituloPodcast("El Cartel Paranormal")
 	p2.SetTituloEpisodio("Fantasmas en Bogotá")
 	p2.SetAnfitrion("Carlos Trujillo")
